@@ -26,7 +26,7 @@ struct Timer;
 fn setup_graphics(mut commands: Commands, asset_server: Res<AssetServer>) 
 {
    
-    commands.spawn(Camera2dBundle::default());
+    
     let text_alignment = TextAlignment::Center;
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.

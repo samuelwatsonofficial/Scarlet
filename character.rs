@@ -18,6 +18,11 @@ pub fn spawn_character(mut commands: Commands, asset_server: Res<AssetServer>)
             (
                 RigidBody::Dynamic,
                 Collider::ball(10.),
+                Velocity 
+                {
+                    linvel: Vec2::new(2.,2.),
+                    angvel: 0.0,
+                },
                 Svg2dBundle
                 {
                     svg,
@@ -29,18 +34,42 @@ pub fn spawn_character(mut commands: Commands, asset_server: Res<AssetServer>)
                         ..Default::default()
                     },
                     ..Default::default()
-                }
+                },
+                Character,
             ));
+    commands.spawn((Camera2dBundle::default(),Character));
 
 }
-
-pub fn character_controller(buttons:Res<Input<KeyCode>>)
+pub fn update_camera_position(mut query: Query<(&mut Camera2dBundle, RigidBody)> With<Character>)
 {
-    if buttons.pressed(KeyCode::Right) 
+    for mut (camera,rigidbody) in query.iter()
     {
-       println!("going right"); 
-        // Right Button is being held down
+        camera.transform.translation = rigidbody.transform.translation; 
     }
+}
+pub fn character_controller(mut query: Query<&mut Velocity>,buttons:Res<Input<KeyCode>>)
+{
+    for mut velocity in query.iter_mut()
+    {
+        if buttons.pressed(KeyCode::D) 
+        {
+            velocity.linvel = velocity.linvel + Vec2::new(1.,0.);
+            println!("going right");
+        }
+
+
+        if buttons.pressed(KeyCode::A) 
+        {
+            velocity.linvel = velocity.linvel - Vec2::new(1.,0.);
+            println!("going left");
+        }
+        if buttons.pressed(KeyCode::W) 
+        {
+            velocity.linvel = velocity.linvel + Vec2::new(0.,10.);
+            println!("going left");
+        }
+    }
+   
 }
 pub fn display_events(
     mut collision_events: EventReader<CollisionEvent>,
