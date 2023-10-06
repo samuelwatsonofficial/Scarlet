@@ -8,17 +8,20 @@ mod character;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-        .add_plugin(RapierDebugRenderPlugin::default()) 
-        .add_plugin(bevy_svg::prelude::SvgPlugin)
+        .add_plugins(
+            (
+            DefaultPlugins,
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
+            bevy_svg::prelude::SvgPlugin,
+            RapierDebugRenderPlugin::default()
+            ))
         .add_startup_system(setup_graphics)
         .add_startup_system(setup_physics)
         .add_startup_system(character::spawn_character)
-        .add_system(print_ball_altitude)
         .add_system(character::character_controller)
         .add_system(timer_update)
         .add_system(character::display_events)
+        .add_system(character::update_camera_position)
         .run();
 }
 #[derive(Component)]
@@ -26,7 +29,7 @@ struct Timer;
 fn setup_graphics(mut commands: Commands, asset_server: Res<AssetServer>) 
 {
    
-    commands.spawn(Camera2dBundle::default());
+    
     let text_alignment = TextAlignment::Center;
     commands.spawn((
         // Create a TextBundle that has a Text with a single section.
@@ -65,12 +68,5 @@ fn timer_update(time: Res<Time>, mut query: Query<&mut Text, With<Timer>> )
         let value=time.elapsed().as_millis() as f64/1000.;
         text.sections[0].value=format!("{value:.2}");
 
-    }
-}
-
-
-fn print_ball_altitude(positions: Query<&Transform, With<RigidBody>>) {
-    for transform in positions.iter() {
-        //println!("Ball altitude: {}", transform.translation.y);
     }
 }
